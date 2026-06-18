@@ -239,6 +239,7 @@ endif
 PRODUCT_PACKAGES += \
     fstab.default \
     fstab.default.vendor_ramdisk \
+    init.aospa.rc \
     init.class_main.sh \
     init.kernel.post_boot-memory.sh \
     init.kernel.post_boot-sun.sh \
