@@ -152,6 +152,8 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.display.snapalloc-impl
 
 # DRM
+PRODUCT_PACKAGES += duck_rkp
+
 PRODUCT_PACKAGES += \
     android.hardware.drm-service.clearkey
 

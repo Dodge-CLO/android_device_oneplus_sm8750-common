@@ -271,3 +271,5 @@ include vendor/oneplus/sm8750-common/BoardConfigVendor.mk
 
 # Oplus camera extension
 BOARD_VENDOR_KERNEL_MODULES += $(KERNEL_MODULES_OUT)/camera_extension.ko
+
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += device/oneplus/sm8750-common/duck-rkp/compatibility_matrix.xml

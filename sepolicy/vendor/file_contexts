@@ -30,3 +30,5 @@
 /(vendor|odm)/lib(64)?/aiframe/libtransformer_lite\.so                           u:object_r:same_process_hal_file:s0
 /(vendor|odm)/lib(64)?/libaiboost_llm\.so                                        u:object_r:same_process_hal_file:s0
 /(vendor|odm)/lib(64)?/libaiboost\.so                                            u:object_r:same_process_hal_file:s0
+
+/vendor/bin/duck_rkp    u:object_r:duck_rkp_exec:s0
