@@ -5,6 +5,15 @@
 
 COMMON_PATH := device/oneplus/sm8750-common
 
+# add-radio-file-sha1-checked is used by the generated firmware makefiles
+define add-radio-file-sha1-checked
+  $(eval path := $(LOCAL_PATH)/$(1))
+  $(eval sha1 := $(shell sha1sum "$(path)" | cut -d" " -f 1))
+  $(if $(filter $(sha1),$(2)),
+    $(call add-radio-file,$(1)),
+    $(error $(path) SHA1 mismatch ($(sha1) != $(2))))
+endef
+
 # A/B
 AB_OTA_UPDATER := true
 
@@ -46,6 +55,9 @@ BOARD_USES_ALSA_AUDIO := true
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := sun
 
+# Build
+BUILD_BROKEN_DUP_RULES := true
+
 # Boot
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
@@ -53,8 +65,6 @@ BOARD_RAMDISK_USE_LZ4 := true
 
 # DTB / DTBO
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
-BOARD_USES_QCOM_MERGE_DTBS_SCRIPT := true
-TARGET_NEEDS_DTBOIMAGE := true
 
 # Properties
 TARGET_ODM_PROP += $(COMMON_PATH)/properties/odm.prop
@@ -63,7 +73,7 @@ TARGET_SYSTEM_EXT_PROP += $(COMMON_PATH)/properties/system_ext.prop
 TARGET_VENDOR_PROP += $(COMMON_PATH)/properties/vendor.prop
 
 # Filesystem
-TARGET_FS_CONFIG_GEN := $(COMMON_PATH)/config.fs
+TARGET_FS_CONFIG_GEN += $(COMMON_PATH)/config.fs
 
 # Init Boot
 BOARD_INIT_BOOT_HEADER_VERSION := 4
@@ -92,87 +102,43 @@ BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_IMAGE_NAME := Image
 
-TARGET_KERNEL_SOURCE := kernel/oneplus/sm8750
-
-TARGET_KERNEL_ADDITIONAL_FLAGS := CONFIG_OPLUS_DEVICE_DTBS=y
-TARGET_KERNEL_CONFIG := \
-    gki_defconfig \
-    vendor/sun_perf.config \
-    vendor/oplus/sun_perf.config
+# Kernel
+TARGET_KERNEL_VARIANT := perf
+TARGET_USES_SMMU_PROXY := true
 
 # Kernel modules
-BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load.system_dlkm))
-BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(TARGET_KERNEL_SOURCE)/modules.vendor_blocklist.msm.sun
-BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load))
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_BLOCKLIST_FILE := $(BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE)
-# qrtr-gunyah.ko is detected by depmod of build_utils.sh in kleaf
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := \
-    $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.list.msm.sun)) \
-    qrtr-gunyah.ko
-BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load.recovery))
-BOOT_KERNEL_MODULES := $(BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD)
-SYSTEM_KERNEL_MODULES := \
-    $(BOARD_SYSTEM_KERNEL_MODULES_LOAD) \
-    $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.kunit))
+BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load))
+BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load.recovery))
 
-TARGET_KERNEL_EXT_MODULE_ROOT := kernel/oneplus/sm8750-modules
-TARGET_KERNEL_EXT_MODULES := \
-    oplus/kernel/device_info/oplus_fpga/fpga_monitor:kbuild \
-    qcom/opensource/mmrm-driver \
-    qcom/opensource/mm-drivers/hw_fence \
-    qcom/opensource/mm-drivers/msm_ext_display \
-    qcom/opensource/mm-drivers/sync_fence \
-    qcom/opensource/audio-kernel \
-    qcom/opensource/securemsm-kernel \
-    qcom/opensource/synx-kernel \
-    qcom/opensource/camera-kernel \
-    qcom/opensource/data-kernel/drivers/smem-mailbox \
-    qcom/opensource/datarmnet-ext/mem \
-    qcom/opensource/dataipa/drivers/platform/msm \
-    qcom/opensource/datarmnet/core \
-    qcom/opensource/datarmnet-ext/aps \
-    qcom/opensource/datarmnet-ext/offload \
-    qcom/opensource/datarmnet-ext/perf \
-    qcom/opensource/datarmnet-ext/perf_tether \
-    qcom/opensource/datarmnet-ext/sch \
-    qcom/opensource/datarmnet-ext/shs \
-    qcom/opensource/datarmnet-ext/wlan \
-    qcom/opensource/display-drivers/msm \
-    qcom/opensource/dsp-kernel \
-    qcom/opensource/eva-kernel \
-    qcom/opensource/graphics-kernel \
-    qcom/opensource/spu-kernel \
-    qcom/opensource/video-driver \
-    qcom/opensource/wlan/platform \
-    qcom/opensource/wlan/qcacld-3.0/.kiwi_v2 \
-    qcom/opensource/wlan/qcacld-3.0/.peach_v2 \
-    qcom/opensource/wlan/qcacld-3.0/.wcn7750 \
-    qcom/opensource/bt-kernel
+BOARD_VENDOR_KERNEL_MODULES += $(addprefix $(KERNEL_MODULES_OUT)/, \
+    cnss2.ko \
+    cnss_nl.ko \
+    cnss_plat_ipc_qmi_svc.ko \
+    cnss_prealloc.ko \
+    cnss_utils.ko \
+    icnss2.ko \
+    qca_cld3_kiwi_v2.ko \
+    qca_cld3_peach_v2.ko \
+    qca_cld3_wcn7750.ko \
+    wlan_firmware_service.ko)
 
-TARGET_KERNEL_EXT_MODULES += \
-    oplus/hardware/radio/kernel/mdmfeature:kbuild \
-    oplus/kernel/camera:kbuild \
-    oplus/kernel/cpu/thermal:kbuild \
-    oplus/kernel/device_info/cs_press:kbuild \
-    oplus/kernel/device_info/magnetic_cover:kbuild \
-    oplus/kernel/device_info/pogo_keyboard:kbuild \
-    oplus/kernel/device_info/tri_state_key:kbuild \
-    oplus/kernel/dfr:kbuild \
-    oplus/kernel/network/oplus_network_oem_qmi:kbuild \
-    oplus/kernel/network/oplus_network_esim:kbuild \
-    oplus/kernel/network/oplus_network_sim_detect:kbuild \
-    oplus/kernel/network/oplus_rf_cable_monitor:kbuild \
-    oplus/kernel/nfc/oplus_nfc:kbuild \
-    oplus/kernel/nfc/thn31:kbuild \
-    oplus/kernel/touchpanel/oplus_touchscreen_v2/touch_custom:kbuild \
-    oplus/kernel/touchpanel/oplus_touchscreen_v2:kbuild \
-    oplus/kernel/touchpanel/synaptics_hbp:kbuild \
-    oplus/kernel/tp/hbp/hbp:kbuild \
-    oplus/secure/biometrics/fingerprints/bsp/uff/driver:kbuild \
-    oplus/secure/common/bsp/drivers/oplus_secure_common \
-    oplus/sensor/kernel/oplus_consumer_ir:kbuild \
-    oplus/sensor/kernel/qcom/sensor:kbuild \
-    nxp/opensource/driver
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(addprefix $(KERNEL_MODULES_OUT)/, \
+    adsp_loader_dlkm.ko \
+    gpr_dlkm.ko \
+    hdcp_qseecom_dlkm.ko \
+    ipclite.ko \
+    msm_drm.ko \
+    msm_ext_display.ko \
+    msm_hw_fence.ko \
+    msm-mmrm.ko \
+    q6_notifier_dlkm.ko \
+    q6_pdr_dlkm.ko \
+    smcinvoke_dlkm.ko \
+    smmu_proxy_dlkm.ko \
+    snd_event_dlkm.ko \
+    spf_core_dlkm.ko \
+    sync_fence.ko \
+    synx-driver.ko)
 
 # Platform
 BOARD_USES_QCOM_HARDWARE := true
@@ -223,8 +189,19 @@ BOOT_SECURITY_PATCH := 2026-09-01
 VENDOR_SECURITY_PATCH := $(BOOT_SECURITY_PATCH)
 
 # SEPolicy
+# QCOM policy first, hardware/oplus attaches attributes to its domains
+TARGET_EXCLUDE_QCOM_SEPOLICY := true
 include device/qcom/sepolicy_vndr/SEPolicy.mk
+include device/qcom/common/sepolicy/SEPolicy.mk
+QCOM_SEPOLICY_PATH := $(SEPOLICY_PATH)
+SEPOLICY_PATH :=
 include hardware/oplus/sepolicy/qti/SEPolicy.mk
+SEPOLICY_PATH := $(QCOM_SEPOLICY_PATH)
+
+# UFS
+SOONG_CONFIG_NAMESPACES += ufsbsg
+SOONG_CONFIG_ufsbsg += ufsframework
+SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Verified Boot
 BOARD_AVB_ENABLE := true
@@ -264,20 +241,12 @@ BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX_LOCATION := 6
 
 # WiFi
-BOARD_WLAN_DEVICE := qcwcn
-BOARD_HOSTAPD_DRIVER := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
-BOARD_WPA_SUPPLICANT_DRIVER := $(BOARD_HOSTAPD_DRIVER)
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := $(BOARD_HOSTAPD_PRIVATE_LIB)
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB_EVENT := "ON"
-WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
-WIFI_DRIVER_STATE_OFF := "OFF"
-WIFI_DRIVER_STATE_ON := "ON"
-WIFI_FEATURE_HOSTAPD_11AX := true
 WIFI_HIDL_FEATURE_AWARE := true
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
-WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
-WPA_SUPPLICANT_VERSION := VER_0_8_X
 
 # Include the proprietary files BoardConfig.
 include vendor/oneplus/sm8750-common/BoardConfigVendor.mk
+
+# Oplus camera extension
+BOARD_VENDOR_KERNEL_MODULES += $(KERNEL_MODULES_OUT)/camera_extension.ko
