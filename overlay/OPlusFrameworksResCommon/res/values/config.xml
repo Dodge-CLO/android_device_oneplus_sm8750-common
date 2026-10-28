@@ -78,6 +78,12 @@
     <!-- Whether device supports double tap to wake -->
     <bool name="config_supportDoubleTapWake">true</bool>
 
+    <!-- Double tap to wake: the HBP touch driver reports KEY_WAKEUP (scan code 143)
+         for screen-off gestures, and only the double tap gesture is enabled. -->
+    <integer name="config_doubleTapKeyCode">143</integer>
+    <!-- Wake the device on double tap by default -->
+    <integer name="config_doubleTapDefault">1</integer>
+
     <!-- True if the device supports Sustained Performance Mode-->
     <bool name="config_sustainedPerformanceModeSupported">true</bool>
 
