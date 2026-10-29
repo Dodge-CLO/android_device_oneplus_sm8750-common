@@ -1,5 +1,5 @@
 ## All proprietary files from this list, unless pinned and noted otherwise,
-## are from OnePlus 13 (CPH2653_16.0.10.600(EX01)).
+## are from OnePlus 13 (CPH2649_17.0.0.102(EX01)).
 
 # ACDBs
 vendor/etc/acdbdata/nn_vad_models/fai__3.0.0_0.0__eai_4.2_enpuv5.pmd
@@ -534,11 +534,12 @@ odm/lib64/libaiboost_te.so;FIX_SONAME
 odm/lib64/libaiboost_ubwc.so
 
 # OPLUS Charger
+# Pinned to CPH2649_11.A.01, hardware/oplus lacks the V12 interface
 odm/bin/hw/gauged
-odm/bin/hw/vendor.oplus.hardware.charger-V11-service
+odm/bin/hw/vendor.oplus.hardware.charger-V11-service|bad8eb814c46ec2ee5374ec6024abd169a3f923b
 odm/bin/hw/wlschgd
-odm/etc/init/vendor.oplus.hardware.charger-V11-service.rc
-odm/etc/vintf/manifest/manifest_oplus_charger_aidl.xml
+odm/etc/init/vendor.oplus.hardware.charger-V11-service.rc|6d577cbc5135b6b48a9002dfbbaace085ba97b25
+odm/etc/vintf/manifest/manifest_oplus_charger_aidl.xml|cc3f721ac136c450330964f13e9a5c1c3f5517be
 odm/etc/charge.cfg
 odm/lib64/libGaiaClient_vnd.so
 

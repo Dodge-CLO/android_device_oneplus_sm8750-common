@@ -35,6 +35,10 @@ namespace_imports = [
 def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):
     return f'{lib}_{partition}' if partition == 'vendor' else None
 
+
+def lib_fixup_odm_suffix(lib: str, partition: str, *args, **kwargs):
+    return f'{lib}_{partition}' if partition == 'odm' else None
+
 lib_fixups: lib_fixups_user_type = {
     **lib_fixups,
     (
@@ -73,6 +77,7 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.qccsyshal_aidl-V1-ndk',
         'vendor.qti.qccvndhal_aidl-V1-ndk',
     ): lib_fixup_vendor_suffix,
+    'vendor.oplus.hardware.subsys_radio-V1-ndk': lib_fixup_odm_suffix,
 }
 
 blob_fixups: blob_fixups_user_type = {
@@ -95,6 +100,9 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/hw/libaudioeffecthal.qti.so',
     ): blob_fixup()
         .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so'),
+    'odm/lib64/libqti-radio-service.so': blob_fixup()
+        .replace_needed('vendor.oplus.hardware.subsys_radio-V1-ndk.so', 'vendor.oplus.hardware.subsys_radio-V1-ndk_odm.so'),
+    'odm/lib64/vendor.oplus.hardware.subsys_radio-V1-ndk_odm.so': blob_fixup().fix_soname(),
     'odm/etc/init/init.network.rc': blob_fixup()
         .regex_replace(r'/\* (Huo\.Chen@SYSTEM\.RF, 2024/09/06, Add for ICC) \*/', r'# \1'),
     'product/etc/sysconfig/com.android.hotwordenrollment.common.util.xml': blob_fixup()
