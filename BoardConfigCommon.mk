@@ -79,6 +79,10 @@ TARGET_VENDOR_PROP += $(COMMON_PATH)/properties/vendor.prop
 # Filesystem
 TARGET_FS_CONFIG_GEN += $(COMMON_PATH)/config.fs
 
+# Graphics
+# Vendor blobs allocate GraphicBuffer at the older size
+TARGET_USES_LEGACY_VENDOR_GRAPHICBUFFER := true
+
 # Init Boot
 BOARD_INIT_BOOT_HEADER_VERSION := 4
 BOARD_MKBOOTIMG_INIT_ARGS += --header_version $(BOARD_INIT_BOOT_HEADER_VERSION)
