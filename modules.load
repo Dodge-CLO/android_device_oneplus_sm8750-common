@@ -360,3 +360,9 @@ msm_video.ko
 msm_kgsl.ko
 tms_device_modules.ko
 oplus_nfc.ko
+# OnePlus reclaim tuning
+oplus_bsp_abort_mm_opt.ko
+oplus_bsp_kshrink_slabd.ko
+oplus_bsp_kswapd_opt.ko
+oplus_bsp_mglru_opt.ko
+oplus_bsp_pcppages_opt.ko
