@@ -218,6 +218,9 @@ vendor/etc/display/pipe_config_DPU11__.xml
 vendor/etc/display/ubwc_alignments.json
 vendor/etc/display/video_alignments.json
 
+# Display thermal frame rate limits
+vendor/etc/display/thermallevel_to_fps.xml
+
 # Display features
 odm/bin/hw/vendor.oplus.hardware.displaypanelfeature-service
 odm/etc/PanelChaplin/3D-Lut_Center_P3.txt
@@ -573,6 +576,14 @@ vendor/etc/perf/targetsysnodesconfigs.xml
 vendor/lib64/libqti-s3tf.so
 vendor/lib64/libqti-scenariod.so
 vendor/lib64/libqti-sslite.so
+
+# Power optimization features
+vendor/etc/pwr/CameraPowerOptFeature.xml
+vendor/etc/pwr/GamePowerOptFeature.xml
+vendor/etc/pwr/OffScreenPowerOptFeature.xml
+vendor/etc/pwr/PSMPowerOptFeature.xml
+vendor/etc/pwr/PowerFeatureConfig.xml
+vendor/etc/pwr/VideoPowerOptFeature.xml
 
 # Power-off alarm
 
