@@ -143,6 +143,13 @@ if [ -d /proc/sys/walt ]; then
 	echo 1 > /sys/devices/system/cpu/cpufreq/policy0/walt/pl
 	echo 1 > /sys/devices/system/cpu/cpufreq/policy6/walt/pl
 
+	# zone base target load, as the stock COS17 script sets
+	echo 1324800 80 1747200 80 2112000 80 2438400 80 > /sys/devices/system/cpu/cpufreq/policy0/walt/zone_max_util_pct
+	echo 1900800 80 2380800 80 2784000 80 3264000 80 3628800 80 > /sys/devices/system/cpu/cpufreq/policy6/walt/zone_max_util_pct
+
+	# Do not jump to hispeed_freq while the silver cluster runs below 748800
+	echo 748800 > /sys/devices/system/cpu/cpufreq/policy0/walt/hispeed_cond_freq
+
 	if [ $rev == "1.0" ] || [ $rev == "1.1" ]; then
 		echo 787200 > /sys/devices/system/cpu/cpufreq/policy0/walt/rtg_boost_freq
 		echo 902400 > /sys/devices/system/cpu/cpufreq/policy6/walt/rtg_boost_freq
