@@ -584,6 +584,18 @@ vendor/etc/pwr/OffScreenPowerOptFeature.xml
 vendor/etc/pwr/PSMPowerOptFeature.xml
 vendor/etc/pwr/PowerFeatureConfig.xml
 vendor/etc/pwr/VideoPowerOptFeature.xml
+# Libraries that read the configs above
+vendor/bin/poweropt-service
+vendor/etc/init/poweropt-service.rc
+vendor/lib64/libaodoptfeature.so
+vendor/lib64/libcamerapoweroptfeature.so
+vendor/lib64/libgamepoweroptfeature.so
+vendor/lib64/liboffscreenpoweroptfeature.so
+vendor/lib64/libpowercallback.so
+vendor/lib64/libpowercore.so
+vendor/lib64/libpsmoptfeature.so
+vendor/lib64/libstandbyfeature.so
+vendor/lib64/libvideooptfeature.so
 
 # Power-off alarm
 
