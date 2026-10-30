@@ -100,7 +100,8 @@ function configure_thp()
 {
 	## Goal is to allow all allocations to use THP whilst minimizing allocaiton delays
 	# Allow all eligibe page faults to use THP
-	echo always > /sys/kernel/mm/transparent_hugepage/enabled
+	# Disable THP, as the stock QTI script does
+	echo never > /sys/kernel/mm/transparent_hugepage/enabled
 	# Prevent page faults on THP-elgible VMAs from causing reclaim or compaction
 	echo never > /sys/kernel/mm/transparent_hugepage/defrag
 
@@ -126,15 +127,8 @@ function configure_min_free_kbytes()
 	MemTotal=${MemTotalStr:16:8}
 	let RamSizeGB="( $MemTotal / 1048576 ) + 1"
     # Set the min_free_kbytes to standard kernel value
-	if [ $RamSizeGB -ge 12 ]; then
-		# 12GB, 16GB
-		MinFreeKbytes=11584
-	elif [ $RamSizeGB -ge 8 ]; then
-		# 8GB
-		MinFreeKbytes=11584
-		WatermarkScale=65
-		echo $WatermarkScale > /proc/sys/vm/watermark_scale_factor
-
+	if [ $RamSizeGB -ge 8 ]; then
+		MinFreeKbytes=23168
 	elif [ $RamSizeGB -ge 4 ]; then
 		MinFreeKbytes=8192
 	elif [ $RamSizeGB -ge 2 ]; then
@@ -148,6 +142,10 @@ function configure_min_free_kbytes()
 	echo $MinFreeKbytes > /proc/sys/vm/min_free_kbytes
 	setprop vendor.memory.min_free_kbytes $MinFreeKbytes
 
+	# configure boost pool
+	if [ $RamSizeGB -ge 10 ] && [ -e /proc/boost_pool/camera_pages ]; then
+		echo 128000 > /proc/boost_pool/camera_pages
+	fi
 }
 
 function configure_memory_parameters() {
@@ -161,6 +159,9 @@ function configure_memory_parameters() {
 	configure_min_free_kbytes
 
 	echo 100 > /proc/sys/vm/swappiness
+
+	# Disable periodic kcompactd wakeups
+	echo 0 > /proc/sys/vm/compaction_proactiveness
 
 	#Set per-app max kgsl reclaim limit and per shrinker call limit
 	if [ -f /sys/class/kgsl/kgsl/page_reclaim_per_call ]; then
