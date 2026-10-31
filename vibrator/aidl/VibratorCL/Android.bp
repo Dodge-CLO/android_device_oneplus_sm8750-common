@@ -7,8 +7,8 @@ cc_library_shared {
     vendor: true,
     srcs: ["Vibrator.cpp"],
     include_dirs: [
-        "hardware/qcom-caf/sm8750/audio/pal/inc/",
-        "hardware/qcom-caf/sm8750/audio/graphservices/spf/api/modules",
+        "vendor/qcom/opensource/pal/inc/",
+        "vendor/qcom/opensource/audioreach-graphservices/spf/api/modules",
     ],
     header_libs: [
         "libspf-headers",
