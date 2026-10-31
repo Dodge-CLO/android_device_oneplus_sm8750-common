@@ -56,6 +56,7 @@ namespace vibrator {
 #define STRONG_MAGNITUDE        0x7fff
 #define MEDIUM_MAGNITUDE        0x5fff
 #define LIGHT_MAGNITUDE         0x3fff
+#define PRIMITIVE_MIN_SCALE     0.02f
 #define INVALID_VALUE           -1
 #define CUSTOM_DATA_LEN         3
 #define NAME_BUF_SIZE           32
@@ -328,7 +329,6 @@ int InputFFDevice::playEffect(int effectId, EffectStrength es, long *playLengthM
 }
 
 int InputFFDevice::playPrimitive(int primitiveId, float amplitude, long *playLengthMs) {
-    int8_t tmp;
     int ret = 0;
 
     if (primitiveId > MAX_PATTERN_ID) {
@@ -337,9 +337,20 @@ int InputFFDevice::playPrimitive(int primitiveId, float amplitude, long *playLen
     }
 
     primitiveId |= PRIMITIVE_ID_MASK;
-    tmp = (uint8_t)(amplitude * 0xff);
-    mCurrMagnitude = tmp * (STRONG_MAGNITUDE - LIGHT_MAGNITUDE) / 255;
-    mCurrMagnitude += LIGHT_MAGNITUDE;
+
+    /* Scale linearly from silence, skip primitives too weak to feel */
+    if (amplitude < PRIMITIVE_MIN_SCALE) {
+        if (playLengthMs != NULL) {
+            *playLengthMs = 0;
+#ifdef USE_EFFECT_STREAM
+            const struct effect_stream *stream = get_effect_stream(primitiveId);
+            if (stream != NULL && stream->play_rate_hz != 0)
+                *playLengthMs = ((stream->length * 1000) / stream->play_rate_hz) + 1;
+#endif
+        }
+        return 0;
+    }
+    mCurrMagnitude = (int)(amplitude * STRONG_MAGNITUDE);
 
     ret = play(primitiveId, INVALID_VALUE, playLengthMs);
     if (ret != 0)
