@@ -1,2 +1,35 @@
 # Vibrator
 /vendor/bin/hw/vendor\.qti\.hardware\.vibrator\.service\.oplus_sm8750    u:object_r:hal_vibrator_default_exec:s0
+
+# AI frame / AI boost (QNN)
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnDspV66Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnHtpV68Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnHtpV69Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnHtpV73Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnHtpV75Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/signed/libQnnHtpV79Skel\.so                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnDspV66Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnHtpV68Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnHtpV69Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnHtpV73Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnHtpV75Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/cdsp/unsigned/libQnnHtpV79Skel\.so                u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libaiboost_litert\.so                             u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libaiboost_qnn_external_delegate\.so              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libqcom_llm\.so                                   u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnDsp\.so                                     u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnDspV66Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpPrepare\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtp\.so                                     u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpV68Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpV69Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpV73Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpV75Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnHtpV79Stub\.so                              u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libQnnSystem\.so                                  u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/aiframe/libtransformer_lite\.so                           u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/libaiboost_llm\.so                                        u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/libaiboost_qnn_external_delegate_te\.so                   u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/libaiboost\.so                                            u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/libaiboost_sydet\.so                                      u:object_r:same_process_hal_file:s0
+/(vendor|odm)/lib(64)?/libaiboost_te\.so                                         u:object_r:same_process_hal_file:s0
