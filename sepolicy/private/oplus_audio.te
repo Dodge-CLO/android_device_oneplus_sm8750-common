@@ -1,0 +1,4 @@
+# OPlus audio feature properties
+system_restricted_prop(oplus_audio_prop)
+get_prop(system_app, oplus_audio_prop)
+get_prop(system_server, oplus_audio_prop)

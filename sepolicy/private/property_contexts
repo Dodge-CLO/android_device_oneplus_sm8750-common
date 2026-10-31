@@ -1,0 +1,2 @@
+ro.oplus.audio.           u:object_r:oplus_audio_prop:s0 prefix
+ro.audio.spatializer_type u:object_r:oplus_audio_prop:s0 exact string
