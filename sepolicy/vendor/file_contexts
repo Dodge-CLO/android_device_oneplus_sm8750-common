@@ -29,7 +29,4 @@
 /(vendor|odm)/lib(64)?/aiframe/libQnnSystem\.so                                  u:object_r:same_process_hal_file:s0
 /(vendor|odm)/lib(64)?/aiframe/libtransformer_lite\.so                           u:object_r:same_process_hal_file:s0
 /(vendor|odm)/lib(64)?/libaiboost_llm\.so                                        u:object_r:same_process_hal_file:s0
-/(vendor|odm)/lib(64)?/libaiboost_qnn_external_delegate_te\.so                   u:object_r:same_process_hal_file:s0
 /(vendor|odm)/lib(64)?/libaiboost\.so                                            u:object_r:same_process_hal_file:s0
-/(vendor|odm)/lib(64)?/libaiboost_sydet\.so                                      u:object_r:same_process_hal_file:s0
-/(vendor|odm)/lib(64)?/libaiboost_te\.so                                         u:object_r:same_process_hal_file:s0
