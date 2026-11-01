@@ -78,6 +78,7 @@ persist.vendor.qcom.bluetooth.fmd_config_info=80:0C:60:90:0F:00:00:14:01
 persist.vendor.qcom.bluetooth.fmd_header=8:02:01:06:18:16:AA:FE:40
 persist.vendor.qcom.bluetooth.lossless_aptx_adaptive_le.enabled=true
 ro.bluetooth.a2dp_offload.supported=true
+ro.vendor.bluetooth.btconfigstore=false
 
 # Camera
 ro.camera.enableCamera1MaxZsl=1
