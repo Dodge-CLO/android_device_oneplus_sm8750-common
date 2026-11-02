@@ -31,3 +31,6 @@ on property:vendor.post_boot.parsed=1
 
     write /dev/cpuctl/top-app/cpu.shares 5120
     write /dev/cpuctl/foreground/cpu.shares 4096
+
+    # Avoid migrating the framework/UI pages pinned by PinnerService.
+    write /proc/sys/vm/compact_unevictable_allowed 0
