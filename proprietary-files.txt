@@ -882,6 +882,7 @@ vendor/lib64/liboemcrypto.so
 vendor/lib64/libtrustedapploader.so
 
 # WiFi
+vendor/bin/cnss-daemon:vendor/bin/cnss-daemon-oplus
 odm/bin/init.oplus.wifi.sh
 odm/etc/init/hw/init.oplus.wifi.rc
 vendor/etc/init/init.vendor.wlan.rc
