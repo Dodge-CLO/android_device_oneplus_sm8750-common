@@ -9,6 +9,7 @@ sys.oplus_ftm_mode=997
 persist.vendor.bluetooth.modem_nv_support=true
 
 # Display
+vendor.display.disable_hw_recovery_dump=1
 vendor.display.disable_noise_layer=1
 vendor.display.disable_spec_fence=1
 vendor.display.enable_hdr10_gpu_target=0
@@ -17,7 +18,10 @@ vendor.display.smomo_game_support=0
 
 # Graphics
 debug.graphics.game_default_frame_rate.disabled=0
+debug.sf.disable_client_composition_cache=0
+ro.surface_flinger.clear_slots_with_set_layer_buffer=false
 ro.surface_flinger.game_default_frame_rate_override=120
+ro.surface_flinger.set_touch_timer_ms=0
 
 # Radio
 persist.vendor.radio.force_on_dc=true
