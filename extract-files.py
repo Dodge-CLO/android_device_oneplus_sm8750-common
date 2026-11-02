@@ -76,6 +76,8 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'vendor/bin/init.qti.kernel.sh': blob_fixup()
+        .regex_replace(r'\nstart_msm_irqbalance\n', '\n'),
     'vendor/lib64/vendor.qti.hardware.fm@1.0_vendor.so': blob_fixup().fix_soname(),
     'vendor/lib64/vendor.qti.hardware.fm-V1-ndk_vendor.so': blob_fixup().fix_soname(),
     'vendor/lib64/libbt-hidlclient.so': blob_fixup()
