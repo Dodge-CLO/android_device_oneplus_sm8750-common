@@ -1,0 +1,5 @@
+# GraphicsEnv reads ro.zygote.disable_gl_preload
+get_prop(mediacodec, zygote_config_prop)
+
+# OPlus codecs read unset debug props, e.g. c2.oplus.dumpoutput.filter
+dontaudit mediacodec default_prop:file read;
