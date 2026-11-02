@@ -76,6 +76,15 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'vendor/lib64/vendor.qti.hardware.fm@1.0_vendor.so': blob_fixup().fix_soname(),
+    'vendor/lib64/vendor.qti.hardware.fm-V1-ndk_vendor.so': blob_fixup().fix_soname(),
+    'vendor/lib64/libbt-hidlclient.so': blob_fixup()
+        .replace_needed('vendor.qti.hardware.fm@1.0.so', 'vendor.qti.hardware.fm@1.0_vendor.so'),
+    'vendor/lib64/hw/vendor.qti.hardware.fm-impl.so': blob_fixup()
+        .replace_needed('vendor.qti.hardware.fm-V1-ndk.so', 'vendor.qti.hardware.fm-V1-ndk_vendor.so'),
+    'vendor/bin/hw/android.hardware.bluetooth@aidl-service-qti': blob_fixup()
+        .replace_needed('vendor.qti.hardware.fm-V1-ndk.so', 'vendor.qti.hardware.fm-V1-ndk_vendor.so')
+        .replace_needed('vendor.qti.hardware.fm@1.0.so', 'vendor.qti.hardware.fm@1.0_vendor.so'),
     'odm/bin/hw/vendor.oplus.hardware.biometrics.fingerprint@2.1-service_uff': blob_fixup()
         .add_needed('libshims_aidl_fingerprint_v3.oplus.so'),
     (
