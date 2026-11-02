@@ -1,0 +1,6 @@
+# Activity trigger handler reports app starts to Snapdragon Services
+hal_client_domain(system_server, vendor_hal_snapx_service_qti)
+
+# CachedAppOptimizer process_madvise on cached apps
+dontaudit system_server vndbinder_device:chr_file write;
+dontaudit system_server mediaserver_tmpfs:file write;
