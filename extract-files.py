@@ -27,7 +27,6 @@ namespace_imports = [
     'vendor/qcom/common/system/telephony',
     'vendor/qcom/common/system/wfd',
     'vendor/qcom/common/vendor/alarm',
-    'vendor/qcom/common/vendor/perf',
     'vendor/qcom/common/vendor/wlan',
 ]
 
@@ -63,6 +62,7 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.hardware.fm@1.0',
         'vendor.qti.hardware.minkipcbinder-V1-ndk',
         'vendor.qti.hardware.mwqemadapteraidlservice-V1-ndk',
+        'vendor.qti.hardware.perf2-V1-ndk',
         'vendor.qti.hardware.vpp-V1-ndk',
         'vendor.qti.hardware.wifidisplaysession_aidl-V1-ndk',
         'vendor.qti.ims.callcapabilityaidlservice-V1-ndk',
@@ -137,7 +137,10 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/liblistensoundmodel2vendor.so',
     ): blob_fixup()
         .replace_needed('libtensorflowlite_c.so', 'libtensorflowlite_c_vendor.so'),
-    'vendor/lib64/libqti-perfd.so': blob_fixup()
+    (
+        'vendor/lib64/libapengine.so',
+        'vendor/lib64/libqti-perfd.so',
+    ): blob_fixup()
         .replace_needed('vendor.qti.hardware.display.config-V5-ndk.so', 'vendor.qti.hardware.display.config-V12-ndk.so'),
     'vendor/lib64/libaudioserviceexampleimpl.so': blob_fixup()
         .add_needed('libaudioutils_shim.so')

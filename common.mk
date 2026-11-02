@@ -356,6 +356,8 @@ TARGET_COMMON_QTI_COMPONENTS := \
     wfd \
     wlan
 
+TARGET_PROVIDES_QTI_PERF_BLOBS := true
+
 ifneq ($(TARGET_IS_TABLET),true)
 TARGET_COMMON_QTI_COMPONENTS += \
     telephony
