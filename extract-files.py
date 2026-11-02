@@ -76,6 +76,7 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.latencyaidlservice-V1-ndk',
         'vendor.qti.qccsyshal_aidl-V1-ndk',
         'vendor.qti.qccvndhal_aidl-V1-ndk',
+        'vendor.qti.qspmhal-V1-ndk',
     ): lib_fixup_vendor_suffix,
     'vendor.oplus.hardware.subsys_radio-V1-ndk': lib_fixup_odm_suffix,
 }
