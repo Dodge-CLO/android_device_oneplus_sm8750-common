@@ -208,6 +208,7 @@ QCOM_SEPOLICY_PATH := $(SEPOLICY_PATH)
 SEPOLICY_PATH :=
 include hardware/oplus/sepolicy/qti/SEPolicy.mk
 SEPOLICY_PATH := $(QCOM_SEPOLICY_PATH)
+include $(COMMON_PATH)/sepolicy/SEPolicy.mk
 
 # UFS
 SOONG_CONFIG_NAMESPACES += ufsbsg
