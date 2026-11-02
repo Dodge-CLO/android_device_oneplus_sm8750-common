@@ -66,6 +66,16 @@ on early-init
     export MEMTAG_OPTIONS off
 
 on init
+    # Keep SF main and RenderEngine eligible for every CPU
+    mkdir /dev/cpuset/surfaceflinger
+    copy /dev/cpuset/cpus /dev/cpuset/surfaceflinger/cpus
+    copy /dev/cpuset/mems /dev/cpuset/surfaceflinger/mems
+    chown system system /dev/cpuset/surfaceflinger
+    chown system system /dev/cpuset/surfaceflinger/tasks
+    chown system system /dev/cpuset/surfaceflinger/cgroup.procs
+    chmod 0775 /dev/cpuset/surfaceflinger
+    chmod 0664 /dev/cpuset/surfaceflinger/tasks
+    chmod 0664 /dev/cpuset/surfaceflinger/cgroup.procs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     chown system system /sys/devices/platform/soc/1d84000.ufshc/auto_hibern8
