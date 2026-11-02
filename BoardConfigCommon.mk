@@ -114,6 +114,10 @@ BOARD_SYSTEM_KERNEL_MODULES := $(wildcard device/qcom/sun-kernel/system_dlkm/fla
 BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load.system_dlkm))
 
 BOARD_VENDOR_KERNEL_MODULES += $(addprefix $(KERNEL_MODULES_OUT)/, \
+    ipclite.ko \
+    smmu_proxy_dlkm.ko)
+
+BOARD_VENDOR_KERNEL_MODULES += $(addprefix $(KERNEL_MODULES_OUT)/, \
     cnss2.ko \
     cnss_nl.ko \
     cnss_plat_ipc_qmi_svc.ko \
