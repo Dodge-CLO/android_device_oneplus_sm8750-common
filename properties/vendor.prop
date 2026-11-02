@@ -171,6 +171,9 @@ debug.hwui.use_hint_manager=true
 # Incremental FS
 ro.incremental.enable=yes
 
+# Input Boost
+ro.vendor.input_boost_ms=100
+
 # Keystore
 ro.hardware.keystore_desede=true
 
