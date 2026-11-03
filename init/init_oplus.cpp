@@ -89,4 +89,11 @@ void vendor_load_properties() {
             OverrideProperty("ro.product."s + partition + prop, value);
         }
     }
+
+    // ro.build.fingerprint is not shipped in system/build.prop, so init would
+    // derive it from the build. Report the stock one set on the vendor partition.
+    auto fingerprint = GetProperty("ro.vendor.build.fingerprint", "");
+    if (!fingerprint.empty()) {
+        InitPropertySet("ro.build.fingerprint", fingerprint);
+    }
 }
