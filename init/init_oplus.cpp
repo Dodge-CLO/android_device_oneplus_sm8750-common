@@ -9,6 +9,9 @@
 
 #include <fs_mgr.h>
 
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
+
 #include <string>
 #include <unordered_map>
 
@@ -20,7 +23,9 @@ uint32_t InitPropertySet(const std::string& name, const std::string& value);
 
 using android::base::ParseInt;
 using android::fs_mgr::GetKernelCmdline;
+using android::base::GetProperty;
 using android::init::InitPropertySet;
+using namespace std::string_literals;
 
 namespace {
 constexpr std::string kCmdlineRegion = "oplus_region";
@@ -31,6 +36,18 @@ const std::unordered_map<int, std::string> kRegionMap = {
         {161, "NA"},
         {167, "ROW"},
 };
+
+const char* const kRoProductPartitions[] = {
+        "bootimage.", "product.", "system.", "system_dlkm.",
+        "system_ext.", "vendor.", "vendor_dlkm.",
+};
+
+void OverrideProperty(const std::string& name, const std::string& value) {
+    auto pi = const_cast<prop_info*>(__system_property_find(name.c_str()));
+    if (pi != nullptr) {
+        __system_property_update(pi, value.c_str(), value.size());
+    }
+}
 }  // anonymous namespace
 
 /*
@@ -56,5 +73,20 @@ void vendor_process_bootenv() {
         LOG(ERROR) << "Unexpected region ID: " << region_id;
     } else {
         InitPropertySet("ro.boot.hardware.revision", it->second);
+    }
+}
+
+/*
+ * The build-time model is the EU one. The variant specific odm props
+ * (properties/<prjname>/build.<region>.prop) carry the real model, so
+ * mirror them to the other partitions to keep every ro.product.* consistent.
+ */
+void vendor_load_properties() {
+    for (const auto& prop : {"model", "name"}) {
+        auto value = GetProperty("ro.product.odm."s + prop, "");
+        if (value.empty()) continue;
+        for (const auto& partition : kRoProductPartitions) {
+            OverrideProperty("ro.product."s + partition + prop, value);
+        }
     }
 }
