@@ -209,6 +209,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
 
+# Keep the OPLUS AI Unit search provider out of Settings search
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sysconfig/sysconfig-aiunit.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/sysconfig-aiunit.xml
+
 # HWUI
 TARGET_USES_VULKAN := true
 

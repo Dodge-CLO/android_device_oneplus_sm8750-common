@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <!-- Its indexable XML is rooted at androidx.preference.PreferenceScreen, which Settings
+         Intelligence rejects, and the exception ends every search. -->
+    <component-override package="com.oplus.aiunit">
+        <component class="com.oplus.aiunit.search.AIUnitSearchIndexProvider" enabled="false" />
+    </component-override>
+</config>
