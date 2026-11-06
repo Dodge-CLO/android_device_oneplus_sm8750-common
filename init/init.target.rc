@@ -127,6 +127,10 @@ on boot
     chown system /sys/devices/system/cpu/hyp_core_ctl/enable
     chown system /sys/devices/system/cpu/hyp_core_ctl/hcc_min_freq
 
+    # Battery Saver GPU cap, set by the power HAL
+    chown system system /sys/class/kgsl/kgsl-3d0/max_pwrlevel
+    chmod 0664 /sys/class/kgsl/kgsl-3d0/max_pwrlevel
+
     chown system system /sys/kernel/oplus_display/adfr_config
     chmod 0660 /sys/kernel/oplus_display/adfr_config
     chown system system /sys/kernel/oplus_display/adfr_min_fps

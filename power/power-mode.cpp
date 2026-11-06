@@ -5,8 +5,7 @@
  * SM8750 power HAL mode extension, built into the QTI power HAL through
  * TARGET_POWERHAL_MODE_EXT.
  * Battery Saver (Mode::LOW_POWER) caps CPU and GPU max frequency, and game
- * loading screens (Mode::GAME_LOADING) get a short CPU boost. Both use perf
- * HAL locks, so they work together with thermal-engine and other boosts.
+ * loading screens (Mode::GAME_LOADING) get a short CPU boost.
  *
  * thermal-engine limits the CPUs to the stock boost ceilings. Like stock, the
  * stricter stock limits listed in thermal-engine.conf apply while the user is
@@ -22,6 +21,8 @@
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <dirent.h>
 #include <map>
@@ -32,84 +33,162 @@
 #include <utility>
 #include <vector>
 
-#include "utils.h"
-
 using ::aidl::android::hardware::power::Boost;
 using ::aidl::android::hardware::power::Mode;
 
 namespace {
 
-// Private hint id used to track the Battery Saver perf lock.
-constexpr int kLowPowerHintId = 0x00C41001;
+using Clock = std::chrono::steady_clock;
+using FreqPair = std::pair<int, int>;  // big, prime in kHz
 
-// Perf HAL opcodes. On sun the perf HAL has two clusters: big = cpu0-5 and
-// prime = cpu6-7. Frequency values are in MHz.
-constexpr int kMaxFreqBig = 0x40804000;
-constexpr int kMaxFreqPrime = 0x40804200;
-// GPU max power level. Higher index means lower frequency; level 6 is
-// 660 MHz (top level is 1100 MHz).
-constexpr int kGpuMaxPwrlevel = 0x42808000;
+// Battery Saver CPU limits, stock max is 3532800/4320000
+constexpr FreqPair kLowPowerMax = {2227200, 2649600};
+// GPU max power level for Battery Saver. Higher index means lower frequency;
+// level 6 is 660 MHz (top level is 1100 MHz).
+constexpr int kLowPowerGpuLevel = 6;
 
-int gLowPowerResources[] = {
-        kMaxFreqBig,     2227,  // stock max 3532
-        kMaxFreqPrime,   2649,  // stock max 4320
-        kGpuMaxPwrlevel, 6,
-};
-
-// Min frequency opcodes, same cluster order as above.
-constexpr int kMinFreqBig = 0x40800000;
-constexpr int kMinFreqPrime = 0x40800200;
-
-// Game loading screens (GameManager Mode::GAME_LOADING): raise CPU floors so
-// level loads finish faster. Capped by kGameLoadingMaxMs in case the
+// Game loading screens (GameManager Mode::GAME_LOADING): raise the CPU floors
+// so level loads finish faster. Capped by kGameLoadingMax in case the
 // framework never clears the mode.
-constexpr int kGameLoadingMaxMs = 10000;
-int gGameLoadingResources[] = {
-        kMinFreqBig,   2227,
-        kMinFreqPrime, 2649,
+constexpr FreqPair kGameLoadingMin = {2227200, 2649600};
+constexpr auto kGameLoadingMax = std::chrono::milliseconds(10000);
+
+constexpr const char* kGpuMaxPwrlevel = "/sys/class/kgsl/kgsl-3d0/max_pwrlevel";
+
+int clusterValue(const FreqPair& pair, size_t cluster) {
+    return cluster == 0 ? pair.first : cluster == 1 ? pair.second : 0;
+}
+
+// cpufreq policy directories, ordered by their first CPU
+std::vector<std::string> cpufreqPolicies() {
+    std::vector<std::string> policies;
+    if (DIR* dir = opendir("/sys/devices/system/cpu/cpufreq")) {
+        while (dirent* entry = readdir(dir)) {
+            if (android::base::StartsWith(entry->d_name, "policy")) {
+                policies.push_back(entry->d_name);
+            }
+        }
+        closedir(dir);
+    }
+    std::sort(policies.begin(), policies.end(), [](const auto& a, const auto& b) {
+        return std::stoi(a.substr(6)) < std::stoi(b.substr(6));
+    });
+    for (auto& policy : policies) policy = "/sys/devices/system/cpu/cpufreq/" + policy;
+    return policies;
+}
+
+// The perf HAL on sun rejects CPU frequency and GPU power level locks, so the
+// limits are written to the kernel nodes directly. scaling_min_freq and
+// scaling_max_freq are frequency QoS requests of their own, and kgsl applies
+// thermal limits separately from max_pwrlevel, so thermal-engine still wins.
+// Reading the cpufreq nodes returns the combined policy limits, so releasing a
+// limit writes the cpuinfo bounds, the kernel defaults of these requests.
+class FreqLimits {
+  public:
+    static FreqLimits& get() {
+        static FreqLimits instance;
+        return instance;
+    }
+
+    // Zero means no idle limit for that cluster
+    void setIdleMax(const FreqPair& max) {
+        std::lock_guard<std::mutex> lock(mLock);
+        mIdleMax = max;
+        applyLocked();
+    }
+
+    void setLowPower(bool enabled) {
+        std::lock_guard<std::mutex> lock(mLock);
+        if (enabled == mLowPower) return;
+        mLowPower = enabled;
+        // Battery Saver wins over the loading boost
+        if (enabled) mLoading = false;
+        applyLocked();
+        writeGpuMaxLevel(enabled ? kLowPowerGpuLevel : 0);
+        LOG(INFO) << "Battery saver CPU/GPU cap " << (enabled ? "on" : "off");
+    }
+
+    void setGameLoading(bool enabled) {
+        std::lock_guard<std::mutex> lock(mLock);
+        const uint64_t generation = ++mLoadingGeneration;
+        mLoading = enabled && !mLowPower;
+        applyLocked();
+        if (!mLoading) return;
+        std::thread([this, generation] {
+            std::this_thread::sleep_for(kGameLoadingMax);
+            std::lock_guard<std::mutex> lock(mLock);
+            if (generation != mLoadingGeneration || !mLoading) return;
+            mLoading = false;
+            applyLocked();
+        }).detach();
+    }
+
+  private:
+    struct Policy {
+        std::string minFreq;
+        std::string maxFreq;
+        int bottom = 0;
+        int top = 0;
+        int appliedMin = 0;
+        int appliedMax = 0;
+    };
+
+    FreqLimits() {
+        for (const auto& dir : cpufreqPolicies()) {
+            std::string bottom, top;
+            if (!android::base::ReadFileToString(dir + "/cpuinfo_min_freq", &bottom) ||
+                !android::base::ReadFileToString(dir + "/cpuinfo_max_freq", &top)) {
+                continue;
+            }
+            Policy policy;
+            policy.minFreq = dir + "/scaling_min_freq";
+            policy.maxFreq = dir + "/scaling_max_freq";
+            policy.bottom = std::atoi(bottom.c_str());
+            policy.top = std::atoi(top.c_str());
+            mPolicies.push_back(policy);
+        }
+        // Drop any limits left by a previous instance
+        std::lock_guard<std::mutex> lock(mLock);
+        applyLocked();
+        writeGpuMaxLevel(0);
+    }
+
+    static bool write(const std::string& path, int value) {
+        if (android::base::WriteStringToFile(std::to_string(value), path)) return true;
+        PLOG(WARNING) << "Cannot write " << value << " to " << path;
+        return false;
+    }
+
+    static void writeGpuMaxLevel(int level) { write(kGpuMaxPwrlevel, level); }
+
+    void applyLocked() {
+        for (size_t c = 0; c < mPolicies.size(); c++) {
+            Policy& policy = mPolicies[c];
+
+            int max = policy.top;
+            if (mLowPower) max = std::min(max, clusterValue(kLowPowerMax, c));
+            // A loading screen also lifts the idle limit
+            const int idleMax = clusterValue(mIdleMax, c);
+            if (!mLoading && idleMax > 0) max = std::min(max, idleMax);
+            if (max > 0 && max != policy.appliedMax && write(policy.maxFreq, max)) {
+                policy.appliedMax = max;
+            }
+
+            int min = policy.bottom;
+            if (mLoading) min = std::max(min, clusterValue(kGameLoadingMin, c));
+            if (min > 0 && min != policy.appliedMin && write(policy.minFreq, min)) {
+                policy.appliedMin = min;
+            }
+        }
+    }
+
+    std::mutex mLock;
+    std::vector<Policy> mPolicies;
+    FreqPair mIdleMax = {0, 0};
+    bool mLowPower = false;
+    bool mLoading = false;
+    uint64_t mLoadingGeneration = 0;
 };
-
-std::mutex gLowPowerLock;
-bool gLowPowerActive = false;
-int gGameLoadingHandle = 0;
-
-void setGameLoading(bool enabled) {
-    std::lock_guard<std::mutex> lock(gLowPowerLock);
-    if (gGameLoadingHandle > 0) {
-        release_request(gGameLoadingHandle);
-        gGameLoadingHandle = 0;
-    }
-    // Battery Saver wins over the loading boost.
-    if (!enabled || gLowPowerActive) return;
-
-    int handle = interaction_with_handle(
-            0, kGameLoadingMaxMs,
-            sizeof(gGameLoadingResources) / sizeof(gGameLoadingResources[0]),
-            gGameLoadingResources);
-    if (handle > 0) gGameLoadingHandle = handle;
-}
-
-void setLowPower(bool enabled) {
-    std::lock_guard<std::mutex> lock(gLowPowerLock);
-    if (enabled == gLowPowerActive) return;
-
-    // Drop any running game-loading boost before capping.
-    if (enabled && gGameLoadingHandle > 0) {
-        release_request(gGameLoadingHandle);
-        gGameLoadingHandle = 0;
-    }
-
-    // perform_hint_action() logs a failed perf lock itself; undo_hint_action()
-    // is a no-op for a hint id that never got a lock.
-    if (enabled) {
-        perform_hint_action(kLowPowerHintId, gLowPowerResources,
-                            sizeof(gLowPowerResources) / sizeof(gLowPowerResources[0]));
-    } else {
-        undo_hint_action(kLowPowerHintId);
-    }
-    gLowPowerActive = enabled;
-    LOG(INFO) << "Battery saver CPU/GPU cap " << (enabled ? "on" : "off");
-}
 
 // Idle CPU limits, see the file comment.
 constexpr const char* kThermalEngineConfig = "/vendor/etc/thermal-engine.conf";
@@ -120,9 +199,6 @@ constexpr auto kInteractionHold = std::chrono::milliseconds(2000);
 constexpr auto kLaunchMax = std::chrono::milliseconds(5000);
 // thermal-engine samples the shell temperature once a second.
 constexpr auto kPollInterval = std::chrono::milliseconds(1000);
-
-using Clock = std::chrono::steady_clock;
-using FreqPair = std::pair<int, int>;  // big, prime in kHz
 
 struct Cluster {
     std::string coolingState;
@@ -143,7 +219,7 @@ class IdleLimits {
         std::lock_guard<std::mutex> lock(mLock);
         mInteractUntil = std::max(mInteractUntil, Clock::now() + hold);
         // Lift the limit right away, the worker restores it later
-        if (mHandle > 0) applyLocked(Clock::now());
+        if (mApplied.first > 0) applyLocked(Clock::now());
         mCv.notify_one();
     }
 
@@ -195,19 +271,7 @@ class IdleLimits {
 
     // cpu-clusterN cooling devices step through policy N's frequencies from the top
     bool findClusters() {
-        std::vector<std::string> policies;
-        if (DIR* dir = opendir("/sys/devices/system/cpu/cpufreq")) {
-            while (dirent* entry = readdir(dir)) {
-                if (android::base::StartsWith(entry->d_name, "policy")) {
-                    policies.push_back(entry->d_name);
-                }
-            }
-            closedir(dir);
-        }
-        std::sort(policies.begin(), policies.end(), [](const auto& a, const auto& b) {
-            return std::stoi(a.substr(6)) < std::stoi(b.substr(6));
-        });
-
+        const std::vector<std::string> policies = cpufreqPolicies();
         mClusters.assign(2, {});
         if (policies.size() != mClusters.size()) return false;
         if (DIR* dir = opendir("/sys/class/thermal")) {
@@ -227,8 +291,7 @@ class IdleLimits {
         for (size_t c = 0; c < mClusters.size(); c++) {
             std::string freqs;
             if (mClusters[c].coolingState.empty() ||
-                !android::base::ReadFileToString("/sys/devices/system/cpu/cpufreq/" + policies[c] +
-                                                         "/scaling_available_frequencies",
+                !android::base::ReadFileToString(policies[c] + "/scaling_available_frequencies",
                                                  &freqs)) {
                 return false;
             }
@@ -264,17 +327,9 @@ class IdleLimits {
         }
         if (target == mApplied) return;
 
-        if (mHandle > 0) release_request(mHandle);
-        mHandle = 0;
-        mApplied = {0, 0};
+        FreqLimits::get().setIdleMax(target);
+        mApplied = target;
         if (target.first > 0) {
-            int resources[] = {
-                    kMaxFreqBig,   target.first / 1000,
-                    kMaxFreqPrime, target.second / 1000,
-            };
-            mHandle = interaction_with_handle(0, 0, sizeof(resources) / sizeof(resources[0]),
-                                              resources);
-            if (mHandle > 0) mApplied = target;
             if (target != mLogged) {
                 LOG(INFO) << "Idle CPU limit " << target.first / 1000 << "/"
                           << target.second / 1000 << " MHz";
@@ -309,7 +364,6 @@ class IdleLimits {
     Clock::time_point mInteractUntil;
     Clock::time_point mLaunchUntil;
     bool mScreenOn = true;
-    int mHandle = 0;
     FreqPair mApplied = {0, 0};
     FreqPair mLogged = {0, 0};
 };
@@ -349,10 +403,10 @@ bool setDeviceSpecificMode(Mode type, bool enabled) {
             IdleLimits::get().setScreenOn(enabled);
             return false;
         case Mode::LOW_POWER:
-            setLowPower(enabled);
+            FreqLimits::get().setLowPower(enabled);
             return true;
         case Mode::GAME_LOADING:
-            setGameLoading(enabled);
+            FreqLimits::get().setGameLoading(enabled);
             return true;
         default:
             return false;

@@ -1,3 +1,5 @@
 # Idle CPU limits: read the thermal-engine cooling state of the CPU clusters
 r_dir_file(hal_power_default, sysfs_thermal)
 allow hal_power_default sysfs_devices_system_cpu:file r_file_perms;
+# and write the CPU policy limits while the user is not interacting
+allow hal_power_default sysfs_devices_system_cpu:file w_file_perms;
