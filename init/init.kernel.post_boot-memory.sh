@@ -163,6 +163,9 @@ function configure_memory_parameters() {
 	# Disable periodic kcompactd wakeups
 	echo 0 > /proc/sys/vm/compaction_proactiveness
 
+	# Do not boost kswapd reclaim after fragmentation events
+	echo 0 > /proc/sys/vm/watermark_boost_factor
+
 	#Set per-app max kgsl reclaim limit and per shrinker call limit
 	if [ -f /sys/class/kgsl/kgsl/page_reclaim_per_call ]; then
 		echo 38400 > /sys/class/kgsl/kgsl/page_reclaim_per_call
