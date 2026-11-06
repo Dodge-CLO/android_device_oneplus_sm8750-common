@@ -124,13 +124,10 @@ if [ -d /proc/sys/walt ]; then
 	# Turn off scheduler boost at the end
 	echo 0 > /proc/sys/walt/sched_boost
 
-	# configure input boost settings
-	if [ $rev == "1.0" ] || [ $rev == "1.1" ]; then
-		echo 864000 0 0 0 0 0 0 0 > /proc/sys/walt/input_boost/input_boost_freq
-	else
-		echo 864000 0 0 0 0 0 0 0 > /proc/sys/walt/input_boost/input_boost_freq
-	fi
-	echo 100 > /proc/sys/walt/input_boost/input_boost_ms
+	# configure input boost settings: both clusters, so the first frames of
+	# a touch do not wait for the governor to ramp up
+	echo 1555200 0 0 0 0 0 1401600 0 > /proc/sys/walt/input_boost/input_boost_freq
+	echo 120 > /proc/sys/walt/input_boost/input_boost_ms
 
 	echo "walt" > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
 	echo "walt" > /sys/devices/system/cpu/cpufreq/policy6/scaling_governor
