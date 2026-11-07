@@ -215,6 +215,7 @@ include device/qcom/sepolicy_vndr/SEPolicy.mk
 include device/qcom/common/sepolicy/SEPolicy.mk
 QCOM_SEPOLICY_PATH := $(SEPOLICY_PATH)
 SEPOLICY_PATH :=
+include hardware/oplus/sepolicy/common/SEPolicy.mk
 include hardware/oplus/sepolicy/qti/SEPolicy.mk
 SEPOLICY_PATH := $(QCOM_SEPOLICY_PATH)
 include $(COMMON_PATH)/sepolicy/SEPolicy.mk
