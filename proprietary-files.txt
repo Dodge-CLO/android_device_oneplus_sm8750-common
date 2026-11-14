@@ -918,6 +918,9 @@ vendor/etc/sensors/config/sns_wrist_pedo.json
 vendor/etc/sensors/sns_odp_config
 vendor/etc/sensors/sns_reg_config
 
+# SSR
+vendor/bin/ssr_setup
+
 # Synx
 vendor/lib64/libos.so
 vendor/lib64/libsynx.so

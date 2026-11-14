@@ -206,6 +206,9 @@ persist.vendor.rcs.singlereg.feature=1
 # Sensors
 persist.vendor.sensors.debug.hal=0
 
+# SSR
+persist.vendor.ssr.restart_level=cdsp mss soccp spss
+
 # USB
 ro.usb.uvc.enabled=true
 sys.usb.mtp.batchcancel=1
