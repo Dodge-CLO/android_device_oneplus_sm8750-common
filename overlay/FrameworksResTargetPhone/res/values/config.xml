@@ -8,4 +8,8 @@
          devices where the display has been tuned to be power efficient in DOZE and/or DOZE_SUSPEND
          states. -->
     <bool name="config_dozeAlwaysOnDisplayAvailable">true</bool>
+
+    <!-- Keep the resolution the user picked when an app asks for a display mode;
+         apps may still pick the refresh rate. -->
+    <bool name="config_appResolutionSwitchVoteDisabled">true</bool>
 </resources>
