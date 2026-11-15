@@ -115,11 +115,11 @@ TARGET_KERNEL_VARIANT := perf
 TARGET_USES_SMMU_PROXY := true
 
 # Kernel modules
-BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load))
-BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load.recovery))
+BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(firstword $(wildcard device/qcom/sun-kernel/device-modules.load) $(COMMON_PATH)/modules.load)))
+BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(firstword $(wildcard device/qcom/sun-kernel/device-modules.load.recovery) $(COMMON_PATH)/modules.load.recovery)))
 
 BOARD_SYSTEM_KERNEL_MODULES := $(wildcard device/qcom/sun-kernel/system_dlkm/flatten/lib/modules/*.ko)
-BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(COMMON_PATH)/modules.load.system_dlkm))
+BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell sed 's/#.*$$//;/^$$/d' $(firstword $(wildcard device/qcom/sun-kernel/device-modules.load.system_dlkm) $(COMMON_PATH)/modules.load.system_dlkm)))
 
 BOARD_VENDOR_KERNEL_MODULES += $(addprefix $(KERNEL_MODULES_OUT)/, \
     ipclite.ko \
