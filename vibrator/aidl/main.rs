@@ -92,6 +92,16 @@ impl Vibrator {
     fn select(&self, use_cl: bool) -> Option<&VibratorCl> {
         self.cl.as_ref().filter(|_| use_cl && self.policy.is_some())
     }
+
+    /// The closed loop vibrator for a new play, unless the DSP has already refused one.
+    fn select_for_play(&self, use_cl: bool) -> Option<&VibratorCl> {
+        self.select(use_cl).filter(|cl| cl.usable())
+    }
+
+    fn log_fallback(&self) {
+        static LOGGED: std::sync::Once = std::sync::Once::new();
+        LOGGED.call_once(|| warn!("The closed loop cannot play, using the open loop from now on"));
+    }
 }
 
 impl Interface for Vibrator {}
@@ -111,12 +121,20 @@ impl IVibrator for Vibrator {
     }
 
     fn on(&self, timeoutMs: i32, callback: &Strong<dyn IVibratorCallback>) -> binder::Result<()> {
-        let mut selected = self.cl_selected.lock().unwrap();
-        *selected = self.policy.as_ref().is_some_and(|p| p.on_uses_cl(timeoutMs));
-        match self.select(*selected) {
-            Some(cl) => cl.on(timeoutMs, callback),
-            None => self.ol.on(timeoutMs, callback),
+        if timeoutMs <= 0 {
+            return Err(illegal_argument());
         }
+        let mut selected = self.cl_selected.lock().unwrap();
+        let use_cl = self.policy.as_ref().is_some_and(|p| p.on_uses_cl(timeoutMs));
+        if let Some(cl) = self.select_for_play(use_cl) {
+            *selected = true;
+            match cl.on(timeoutMs, callback) {
+                Err(_) if !cl.usable() => self.log_fallback(),
+                result => return result,
+            }
+        }
+        *selected = false;
+        self.ol.on(timeoutMs, callback)
     }
 
     fn perform(
@@ -126,11 +144,16 @@ impl IVibrator for Vibrator {
         callback: &Strong<dyn IVibratorCallback>,
     ) -> binder::Result<i32> {
         let mut selected = self.cl_selected.lock().unwrap();
-        *selected = self.policy.as_ref().is_some_and(|p| p.perform_uses_cl(effect.0));
-        match self.select(*selected) {
-            Some(cl) => cl.perform(effect, strength, callback),
-            None => self.ol.perform(effect, strength, callback),
+        let use_cl = self.policy.as_ref().is_some_and(|p| p.perform_uses_cl(effect.0));
+        if let Some(cl) = self.select_for_play(use_cl) {
+            *selected = true;
+            match cl.perform(effect, strength, callback) {
+                Err(_) if !cl.usable() => self.log_fallback(),
+                result => return result,
+            }
         }
+        *selected = false;
+        self.ol.perform(effect, strength, callback)
     }
 
     fn getSupportedEffects(&self) -> binder::Result<Vec<Effect>> {

@@ -96,9 +96,12 @@ int32_t vib_pal_update_amplitude(void* handle, float amplitude) {
                      sizeof(config));
 }
 
-int32_t vib_pal_close(void* handle) {
-    int32_t ret = pal_stream_stop(handle);
-    if (ret) ALOGE("Failed to stop haptics stream: %d", ret);
+int32_t vib_pal_close(void* handle, bool started) {
+    int32_t ret;
+    if (started) {
+        ret = pal_stream_stop(handle);
+        if (ret) ALOGE("Failed to stop haptics stream: %d", ret);
+    }
 
     ret = pal_stream_close(handle);
     if (ret) ALOGE("Failed to close haptics stream: %d", ret);

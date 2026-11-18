@@ -24,7 +24,8 @@ int32_t vib_pal_start(void* handle);
 int32_t vib_pal_stop_effect(void* handle);
 int32_t vib_pal_persistent(void* handle);
 int32_t vib_pal_update_amplitude(void* handle, float amplitude);
-int32_t vib_pal_close(void* handle);
+// Stops the stream first when `started`.
+int32_t vib_pal_close(void* handle, bool started);
 int32_t vib_pal_dynamic_cal(void);
 
 #ifdef __cplusplus
