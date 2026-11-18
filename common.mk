@@ -342,6 +342,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     liboplus-uah-client
 
+$(call soong_config_set,qti_power,mode_ext,//$(LOCAL_PATH):libpower_ext_sm8750)
+
 # QSPA
 PRODUCT_PACKAGES += \
     qspa_vendor.rc \

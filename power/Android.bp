@@ -16,3 +16,25 @@ cc_library_static {
     ],
     vendor: true,
 }
+
+rust_defaults {
+    name: "libpower_ext_sm8750-defaults",
+    crate_name: "power_ext",
+    vendor: true,
+    srcs: ["power_mode.rs"],
+    rustlibs: [
+        "android.hardware.power-V6-rust",
+        "liblog_rust",
+    ],
+}
+
+rust_library {
+    name: "libpower_ext_sm8750",
+    defaults: ["libpower_ext_sm8750-defaults"],
+}
+
+rust_test {
+    name: "libpower_ext_sm8750-test",
+    defaults: ["libpower_ext_sm8750-defaults"],
+    test_suites: ["general-tests"],
+}

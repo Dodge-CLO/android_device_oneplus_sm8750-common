@@ -67,7 +67,6 @@ BOARD_RAMDISK_USE_LZ4 := true
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
 # Power: Battery Saver and game loading modes, and double tap to wake through the Oplus touch HAL
-TARGET_POWERHAL_MODE_EXT := $(COMMON_PATH)/power/power-mode.cpp
 TARGET_POWER_FEATURE_EXT_LIB := //$(COMMON_PATH):libpowerfeature_ext_sm8750
 
 # Properties
