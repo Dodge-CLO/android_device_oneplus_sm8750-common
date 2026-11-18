@@ -151,7 +151,8 @@ function configure_min_free_kbytes()
 function configure_memory_parameters() {
 	# Set Memory parameters.
 
-	configure_zram_parameters
+	# zram is set up by mmd after boot (mmd.zram.* in product.prop): it needs an
+	# uninitialised zram0 to add writeback and recompression.
 	configure_read_ahead_kb_values
 	configure_thp
 	# Enabling or disabling thp will reset the value of min_free_kbytes
