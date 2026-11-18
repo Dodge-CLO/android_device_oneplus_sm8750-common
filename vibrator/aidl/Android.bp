@@ -1,89 +1,67 @@
-Common_CFlags = ["-Wall"]
-Common_CFlags += ["-Werror"]
-Common_CFlags += ["-DUSE_EFFECT_STREAM"]
-
-cc_library_shared {
-    name: "vendor.qti.hardware.vibrator.impl.oplus_sm8750",
+cc_library_static {
+    name: "libvibrator_pal_shim.oplus_sm8750",
     vendor: true,
-    cflags: Common_CFlags,
-    srcs: [
-        "Vibrator.cpp",
+    srcs: ["pal_shim.c"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    include_dirs: [
+        "vendor/qcom/opensource/pal/inc",
+        "vendor/qcom/opensource/audioreach-graphservices/spf/api/modules",
+    ],
+    header_libs: [
+        "libspf-headers",
+        "libarosal_headers",
     ],
     shared_libs: [
-        "libcutils",
-        "libutils",
         "liblog",
-        "libbinder_ndk",
-        "android.hardware.vibrator-V2-ndk",
-        "vendor.qti.hardware.vibratorOL.impl.oplus_sm8750",
-        "vendor.qti.hardware.vibratorCL.impl.oplus_sm8750",
-        "vendor.qti.hardware.vibratorSel.impl.oplus_sm8750",
+        "libpalclient",
+    ],
+}
+
+rust_defaults {
+    name: "vendor.qti.hardware.vibrator.service.oplus_sm8750-defaults",
+    vendor: true,
+    prefer_rlib: true,
+    srcs: ["main.rs"],
+    rustlibs: [
+        "android.hardware.vibrator-V2-rust",
+        "libbinder_rs",
+        "liblibc",
+        "liblog_rust",
+        "liblogger",
+        "libnix",
+        "librustutils",
+    ],
+    static_libs: ["libvibrator_pal_shim.oplus_sm8750"],
+    shared_libs: [
+        "liblog",
+        "libpalclient",
     ] + select(soong_config_variable("qti_vibrator", "effect_lib"), {
         // A device may override the effect lib (e.g. a haptic-profile-aware
         // one) via qti_vibrator/effect_lib; default keeps the common impl.
         any @ flag_val: [flag_val],
         default: ["libqtivibratoreffect.oplus_sm8750"],
     }),
-    export_include_dirs: ["include"],
-    include_dirs: [
-        "external/expat/lib",
-    ]
 }
 
-cc_binary {
+rust_binary {
     name: "vendor.qti.hardware.vibrator.service.oplus_sm8750",
-    vendor: true,
+    defaults: ["vendor.qti.hardware.vibrator.service.oplus_sm8750-defaults"],
     relative_install_path: "hw",
     init_rc: ["vendor.qti.hardware.vibrator.service.oplus_sm8750.rc"],
-    vintf_fragments: [
-        "vendor.qti.hardware.vibrator.service.oplus_sm8750.xml",
-    ],
-    cflags: Common_CFlags,
-    srcs: [
-        "service.cpp",
-    ],
-    shared_libs: [
-        "libcutils",
-        "libutils",
-        "libbase",
-        "libbinder_ndk",
-        "android.hardware.vibrator-V2-ndk",
-        "vendor.qti.hardware.vibrator.impl.oplus_sm8750",
-    ],
+    vintf_fragments: ["vendor.qti.hardware.vibrator.service.oplus_sm8750.xml"],
+}
+
+rust_test {
+    name: "vendor.qti.hardware.vibrator.service.oplus_sm8750-test",
+    defaults: ["vendor.qti.hardware.vibrator.service.oplus_sm8750-defaults"],
+    test_suites: ["general-tests"],
 }
 
 prebuilt_etc {
     name: "HapticsPolicy.xml",
     vendor: true,
     src: "HapticsPolicy.xml",
-}
-
-cc_fuzz {
-    name: "vendor.qti.hardware.vibrator-service.aidl_fuzzer.oplus_sm8750",
-    vendor: true,
-
-    shared_libs: [
-        "liblog",
-        "libbase",
-        "libutils",
-        "libcutils",
-        "libbinder",
-        "libbinder_ndk",
-        "android.hardware.vibrator-V2-ndk",
-        "vendor.qti.hardware.vibrator.impl.oplus_sm8750",
-    ],
-
-    static_libs: [
-        "libbinder_random_parcel",
-    ],
-
-    srcs: [
-        "fuzzer.cpp",
-    ],
-
-    cflags: [
-        "-Wno-unused-parameter",
-        "-Wno-unused-variable",
-        "-fexceptions",
-    ],
 }

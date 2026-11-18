@@ -38,6 +38,14 @@ struct effect_stream {
     const int8_t    *data;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 const struct effect_stream *get_effect_stream(uint32_t effect_id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
