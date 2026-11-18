@@ -360,6 +360,18 @@ impl IdleLimits {
     }
 }
 
+/// All frequencies of a policy, highest first, as its cpu-clusterN cooling device counts them.
+fn freq_table(available: &str, boost: &str) -> Vec<i32> {
+    let mut freqs: Vec<i32> = available
+        .split_whitespace()
+        .chain(boost.split_whitespace())
+        .filter_map(|f| f.parse().ok())
+        .collect();
+    freqs.sort_unstable_by(|a, b| b.cmp(a));
+    freqs.dedup();
+    freqs
+}
+
 /// cpu-clusterN cooling devices step through policy N's frequencies from the top.
 fn find_clusters() -> Option<Vec<Cluster>> {
     let policies = cpufreq_policies();
@@ -381,12 +393,14 @@ fn find_clusters() -> Option<Vec<Cluster>> {
         .zip(states)
         .map(|(policy, cooling_state)| {
             let freqs = fs::read_to_string(format!("{policy}/scaling_available_frequencies")).ok()?;
-            let mut freqs_descending: Vec<i32> =
-                freqs.split_whitespace().filter_map(|f| f.parse().ok()).collect();
+            // The cooling device also steps through the boost frequencies, which cpufreq lists
+            // separately (the prime cluster tops out at 4320000 only there).
+            let boost =
+                fs::read_to_string(format!("{policy}/scaling_boost_frequencies")).unwrap_or_default();
+            let freqs_descending = freq_table(&freqs, &boost);
             if freqs_descending.is_empty() {
                 return None;
             }
-            freqs_descending.sort_unstable_by(|a, b| b.cmp(a));
             Some(Cluster { cooling_state: cooling_state?, freqs_descending })
         })
         .collect()
@@ -460,6 +474,20 @@ mod tests {
         assert_eq!(limits.len(), 2);
         assert_eq!(limits[&(3532800, 4320000)], (2227200, 1689600));
         assert_eq!(limits[&(2400000, 2246400)], (1555200, 1401600));
+    }
+
+    #[test]
+    fn freq_table_counts_boost_frequencies() {
+        // dodge policy6: cooling state 10 under thermal-engine level 2400000+2246400.
+        let available = "1017600 1209600 1401600 1689600 1958400 2246400 2438400 2649600 \
+                         2841600 3072000 3283200 3513600 3801600 4089600\n";
+        let table = freq_table(available, "4204800 4320000 \n");
+        assert_eq!(table.len(), 16);
+        assert_eq!(table[0], 4320000);
+        assert_eq!(table[10], 2246400);
+        // Without a boost list nothing changes, and duplicates are dropped.
+        assert_eq!(freq_table("300 200 100", ""), vec![300, 200, 100]);
+        assert_eq!(freq_table("300 200", "300"), vec![300, 200]);
     }
 
     #[test]
