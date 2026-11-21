@@ -78,7 +78,7 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.qccvndhal_aidl-V1-ndk',
         'vendor.qti.qspmhal-V1-ndk',
     ): lib_fixup_vendor_suffix,
-    'vendor.oplus.hardware.subsys_radio-V1-ndk': lib_fixup_odm_suffix,
+    'vendor.oplus.hardware.subsys_radio-V2-ndk': lib_fixup_odm_suffix,
 }
 
 blob_fixups: blob_fixups_user_type = {
@@ -102,16 +102,14 @@ blob_fixups: blob_fixups_user_type = {
     ): blob_fixup()
         .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so'),
     'odm/lib64/libqti-radio-service.so': blob_fixup()
-        .replace_needed('vendor.oplus.hardware.subsys_radio-V1-ndk.so', 'vendor.oplus.hardware.subsys_radio-V1-ndk_odm.so'),
-    'odm/lib64/vendor.oplus.hardware.subsys_radio-V1-ndk_odm.so': blob_fixup().fix_soname(),
+        .replace_needed('vendor.oplus.hardware.subsys_radio-V2-ndk.so', 'vendor.oplus.hardware.subsys_radio-V2-ndk_odm.so'),
+    'odm/lib64/vendor.oplus.hardware.subsys_radio-V2-ndk_odm.so': blob_fixup().fix_soname(),
     'odm/etc/init/init.network.rc': blob_fixup()
         .regex_replace(r'/\* (Huo\.Chen@SYSTEM\.RF, 2024/09/06, Add for ICC) \*/', r'# \1'),
     'product/etc/sysconfig/com.android.hotwordenrollment.common.util.xml': blob_fixup()
         .regex_replace('/my_product', '/product'),
     'system/framework/WfdCommon.jar': blob_fixup()
         .apktool_patch('blob-patches/WfdCommon.patch'),
-    'system_ext/bin/horae': blob_fixup()
-        .replace_needed('libprotobuf-cpp-lite.so', 'libprotobuf-cpp-lite-21.7.so'),
     (
         'system_ext/etc/seccomp_policy/tcmd.policy',
         'vendor/etc/seccomp_policy/syshealthmon.policy'

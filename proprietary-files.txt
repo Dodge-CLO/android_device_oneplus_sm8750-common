@@ -1,5 +1,5 @@
 ## All proprietary files from this list, unless pinned and noted otherwise,
-## are from OnePlus 13 (CPH2649_17.0.0.102(EX01)).
+## are from OnePlus 13 (CPH2649_17.0.1.202(EX01)).
 
 # ACDBs
 vendor/etc/acdbdata/nn_vad_models/fai__3.0.0_0.0__eai_4.2_enpuv5.pmd
@@ -129,9 +129,10 @@ vendor/lib64/libsdsprpc.so
 vendor/etc/charger_fw_fstab.qti
 
 # Configstore
-vendor/bin/hw/vendor.qti.hardware.capabilityconfigstore-service
-vendor/etc/init/vendor.qti.hardware.capabilityconfigstore-service.rc
-vendor/etc/vintf/manifest/vendor.qti.hardware.capabilityconfigstore-service.xml
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/bin/hw/vendor.qti.hardware.capabilityconfigstore-service|46a3a69a2f6e747e17c9dadb2a86e1889f4d7d95
+vendor/etc/init/vendor.qti.hardware.capabilityconfigstore-service.rc|cdf8b2ff791a3c4720d3034d8774aa63f91454e3
+vendor/etc/vintf/manifest/vendor.qti.hardware.capabilityconfigstore-service.xml|9674508adcecb50eff7875bb2cdf77d30539dd01
 vendor/lib64/hw/vendor.qti.hardware.capabilityconfigstore-impl.so
 vendor/lib64/vendor.qti.hardware.capabilityconfigstore-V1-ndk.so
 
@@ -455,34 +456,40 @@ odm/lib64/libqcodec2_dolbydecoderfilter.so
 odm/lib64/libqcodec2_dolbyencoderfilter.so
 vendor/bin/hw/qconfigservice
 vendor/bin/hw/vendor.qti.media.c2@1.0-service
-vendor/bin/hw/vendor.qti.media.c2audio@1.0-service
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/bin/hw/vendor.qti.media.c2audio@1.0-service|10a6aab4c6bda3fba905880b329518c2f7cfb50e
 vendor/bin/init.qti.media.sh
 vendor/etc/init/init.qti.media.rc
 vendor/etc/init/qconfig.rc
 vendor/etc/init/vendor.qti.media.c2@1.0-service.rc
-vendor/etc/init/vendor.qti.media.c2audio@1.0-service.rc
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/init/vendor.qti.media.c2audio@1.0-service.rc|51841b9c67dd26b7fe82e24109f1e0a663a3e04a
 vendor/etc/media_sun/video_system_specs.json
 vendor/etc/seccomp_policy/codec2.vendor.base-arm64.policy
 vendor/etc/seccomp_policy/codec2.vendor.ext-arm64.policy
 vendor/etc/vintf/manifest/c2_manifest_vendor.xml
-vendor/etc/vintf/manifest/c2_manifest_vendor_audio.xml
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/vintf/manifest/c2_manifest_vendor_audio.xml|abffb90162a6c67b02f98b079d8a29a8e5ad51e4
 vendor/etc/vintf/manifest/vendor.qti.hardware.qconfig-service.xml
 vendor/etc/media_codecs_performance_sun_vendor.xml:vendor/etc/media_codecs_performance_sun.xml;TRYSRCFIRST
 vendor/etc/media_codecs_sun_vendor.xml:vendor/etc/media_codecs_sun.xml;TRYSRCFIRST
 vendor/lib64/libAlacSwDec.so
 vendor/lib64/libApeSwDec.so
-vendor/lib64/libEvrcSwCodec.so
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/lib64/libEvrcSwCodec.so|4e21435f39720937b9302ac9cab6370e26b3b5f4
 vendor/lib64/libFlacSwDec.so
-vendor/lib64/libQcelp13SwCodec.so
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/lib64/libQcelp13SwCodec.so|40e77d26806214c9bbc6a968fd704bacc38d8886
 vendor/lib64/libmmosal_vendor.so
-vendor/lib64/libqc2audio_base.so
-vendor/lib64/libqc2audio_basecodec.so
-vendor/lib64/libqc2audio_core.so
-vendor/lib64/libqc2audio_hooks.so
-vendor/lib64/libqc2audio_hwaudiocodec.so
-vendor/lib64/libqc2audio_platform.so
-vendor/lib64/libqc2audio_swaudiocodec.so
-vendor/lib64/libqc2audio_utils.so
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/lib64/libqc2audio_base.so|22c0752daa39c47c74b6cd25e0846345385278a6
+vendor/lib64/libqc2audio_basecodec.so|1c1916a31b9fdcb175ad438d97d1f78ec30354a4
+vendor/lib64/libqc2audio_core.so|0664946ca3765767a067bd701bdaf251a7c51ee0
+vendor/lib64/libqc2audio_hooks.so|62c3cb182b33a832b4fce2ce9f226324f3b7e138
+vendor/lib64/libqc2audio_hwaudiocodec.so|fb331358408524d3d4a9ead14c30bbaa739d3815
+vendor/lib64/libqc2audio_platform.so|990d6d6d811465cbb6456066439ef4027a8ee4bf
+vendor/lib64/libqc2audio_swaudiocodec.so|82ff7b3e09fb5b6528d3f023b464d8a278c49d49
+vendor/lib64/libqc2audio_utils.so|0a45543758347103c498fa3759d8e061e1cf1de8
 vendor/lib64/libqc2vppfilter.so
 vendor/lib64/libqcodec2_base.so
 vendor/lib64/libqcodec2_basecodec.so
@@ -570,8 +577,9 @@ vendor/lib64/libperipheral_client.so
 # The CLO perf HAL fails on the sun configs
 vendor/bin/hw/vendor.qti.hardware.perf2-hal-service
 vendor/bin/hw/vendor.qti.hardware.servicetrackeraidl-service
-vendor/bin/qsap_qapeservice
-vendor/etc/init/vendor.qsap.qapeservice.rc
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/bin/qsap_qapeservice|b3c3147fd74d17b79ceea35078005833244fedc4
+vendor/etc/init/vendor.qsap.qapeservice.rc|3f3230102529b8f29726c4c93ed0d8b68e845c6e
 vendor/etc/init/vendor.qti.hardware.perf2-hal-service.rc
 vendor/etc/init/vendor.qti.hardware.servicetrackeraidl-service.rc
 vendor/etc/lm/AppClassifierFeature.xml
@@ -601,7 +609,8 @@ vendor/etc/perf/targetresourceconfigs.xml
 vendor/etc/perf/targetsysnodesconfigs.xml
 vendor/etc/perf/testcommonresourceconfigs.xml
 vendor/etc/perf/testtargetresourceconfigs.xml
-vendor/etc/seccomp_policy/qsap_qapeservice.policy
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/seccomp_policy/qsap_qapeservice.policy|aeeddb708bbd2364026418402e9c9a285dccc305
 vendor/etc/vintf/manifest/vendor.qti.hardware.perf2.xml
 vendor/etc/vintf/manifest/vendor.qti.hardware.power.powermodule.xml
 vendor/etc/vintf/manifest/vendor.qti.hardware.servicetrackeraidl-service.xml
@@ -681,7 +690,8 @@ system_ext/lib64/vendor.qti.qccsyshal_aidl-halimpl.so
 system_ext/lib64/vendor.qti.qccvndhal_aidl-V1-ndk.so
 vendor/bin/qcc-vendor
 vendor/etc/init/init.qccvendor.rc
-vendor/etc/vintf/manifest/vendor.qti.qccvndhal_aidl-service.xml
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/vintf/manifest/vendor.qti.qccvndhal_aidl-service.xml|d92ff9bea5a3803104272924440bfe98fa4a4a9f
 vendor/lib64/libqcc_file_agent.so
 vendor/lib64/libqcc_sdk.so
 vendor/lib64/vendor.qti.qccsyshal_aidl-V1-ndk.so;MODULE_SUFFIX=_vendor
@@ -693,13 +703,15 @@ vendor/bin/init.qti.qcv.sh
 vendor/etc/init/init.qti.qcv.rc
 
 # QESDK
-vendor/bin/qesdk-manager
-vendor/bin/snapdragon_services
-vendor/etc/init/qesdk-manager.rc
-vendor/etc/init/snapdragon_services.rc
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/bin/qesdk-manager|83692e65729b1531f523c0d0271b3b350c8aef09
+vendor/bin/snapdragon_services|1e217ab88bbe878bd8e0fe53d64958e2c83f9922
+vendor/etc/init/qesdk-manager.rc|d18ce013771aafaefca955fb6e5d10c2004b9990
+vendor/etc/init/snapdragon_services.rc|c7e2edf91f0a2b4f8f7021dc8e4ead4acbd68635
 vendor/etc/seccomp_policy/qesdk.policy
-vendor/etc/vintf/manifest/qesdk-manager.xml
-vendor/etc/vintf/manifest/snapdragon_services.xml
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/vintf/manifest/qesdk-manager.xml|744a280528294e8cca527b8a50c4889d4e3b4a22
+vendor/etc/vintf/manifest/snapdragon_services.xml|7cc9d53ba93adf641dc96983c6fb4315a7eb5077
 vendor/lib64/libqesdk2_0.so
 vendor/lib64/libqesdk_manager.so
 vendor/lib64/libqesdoem_query_sys.so
@@ -710,8 +722,9 @@ vendor/lib64/vendor.qti.qesdhal@1.2.so
 vendor/lib64/vendor.qti.qesdhal@1.3.so
 vendor/lib64/vendor.qti.qesdhalaidl-V2-ndk.so
 vendor/lib64/vendor.qti.qesdsys-V4-ndk.so
-vendor/lib64/vendor.qti.snapdragonServices-V1-ndk.so
-vendor/lib64/vendor.qti.snapdragonServices.qape-V1-ndk.so
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/lib64/vendor.qti.snapdragonServices-V1-ndk.so|eb11105b99caa5ad5b78f1746122ba38829991ed
+vendor/lib64/vendor.qti.snapdragonServices.qape-V1-ndk.so|2a6e7d27efaa9d35528298b8bd3364af4b99bf57
 
 # QMI
 system/etc/sysconfig/qti_whitelist.xml
@@ -798,7 +811,6 @@ vendor/lib64/vendor.qti.hardware.minkipcbinder-V1-ndk.so;MODULE_SUFFIX=_vendor
 
 # Sensors
 odm/bin/hw/vendor-oplus-hardware-oplusSensor-V1-service
-odm/bin/oplus_sensor_fb
 odm/etc/init/init.oplus.sensor.rc
 odm/etc/init/vendor-oplus-hardware-oplusSensor-V1-service.rc
 odm/etc/vintf/manifest/manifest_oplusSensor_aidl.xml
@@ -806,18 +818,21 @@ odm/lib64/liboplus_service.so
 vendor/bin/hw/vendor.qti.hardware.sensorscalibrate-service
 vendor/bin/init.qcom.sensors.sh
 vendor/bin/qsap_dcfd
-vendor/bin/qsap_sensors
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/bin/qsap_sensors|3e86c3ea383b77fc0fc89337400b7ebbffb97e84
 vendor/bin/sensors.qti
 vendor/bin/sscrpcd
 vendor/etc/init/dcfd.rc
 vendor/etc/init/init.vendor.sensors.rc
-vendor/etc/init/vendor.qsap.sensors.rc
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/init/vendor.qsap.sensors.rc|65a1095ce3c72d712afef27fd54f587110a7dec0
 vendor/etc/init/vendor.qti.hardware.sensorscalibrate-service.rc
 vendor/etc/init/vendor.sensors.qti.rc
 vendor/etc/init/vendor.sensors.sscrpcd.rc
 vendor/etc/permissions/vendor-qti-hardware-sensorscalibrate.xml
 vendor/etc/seccomp_policy/qsap_dcfd.policy
-vendor/etc/seccomp_policy/qsap_sensors.policy
+# Pinned to CPH2649_17.0.0.102(EX01), not in CPH2649_17.0.1.202(EX01)
+vendor/etc/seccomp_policy/qsap_sensors.policy|8fcd82551b6a9445d9c9b04d9a45c306c55d30e4
 vendor/etc/vintf/manifest/vendor.qti.hardware.sensorscalibrate.xml
 vendor/lib64/libDcfHalFramework.so
 vendor/lib64/libDcfHalLogger.so
